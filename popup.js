@@ -1,47 +1,47 @@
-var subscribeButton = document.getElementById("subscribe");
-var refreshButton = document.getElementById("refresh");
-var expandForm = document.getElementById("expandForm");
-var expandButton = document.getElementById("expand");
-var articlesBox = document.getElementById("articles");
-var loadingSpinner = document.getElementById("loadingSpinner");
-var emptyMessage = document.getElementById("emptyMessage");
+var subscribeButton = document.getElementById('subscribe');
+var refreshButton = document.getElementById('refresh');
+var expandForm = document.getElementById('expandForm');
+var expandButton = document.getElementById('expand');
+var articlesBox = document.getElementById('articles');
+var loadingSpinner = document.getElementById('loadingSpinner');
+var emptyMessage = document.getElementById('emptyMessage');
 
 // Format an article.
 function addArticle(options) {
-  var article = document.createElement("article");
+  var article = document.createElement('article');
   articlesBox.appendChild(article);
 
-  var dismissButton = document.createElement("button");
+  var dismissButton = document.createElement('button');
   article.appendChild(dismissButton);
-  dismissButton.appendChild(document.createTextNode("🗙"));
+  dismissButton.appendChild(document.createTextNode('🗙'));
   dismissButton.addEventListener(
-      "click", event => dismiss(article, options.guid));
+      'click', event => dismiss(article, options.guid));
 
-  var link = document.createElement("a");
+  var link = document.createElement('a');
   link.href = options.link;
-  link.target = "_blank";
+  link.target = '_blank';
   article.appendChild(link);
 
-  var header = document.createElement("h1");
+  var header = document.createElement('h1');
   header.appendChild(document.createTextNode(options.title));
   link.appendChild(header);
 
-  var time = document.createElement("time");
+  var time = document.createElement('time');
   article.appendChild(time);
   time.dateTime = options.pubDate;
   var pubDate = new Date(options.pubDate);
   time.appendChild(document.createTextNode(pubDate.toLocaleString()));
 
-  article.appendChild(document.createElement("br"));
+  article.appendChild(document.createElement('br'));
 
-  var preview = document.createElement("iframe");
+  var preview = document.createElement('iframe');
   // Treat the content as same-origin but don't allow scripts to run. This seems
   // like a reasonable compromise but I'm simply waiting to be proven wrong.
-  preview.sandbox = "allow-same-origin allow-popups";
+  preview.sandbox = 'allow-same-origin allow-popups';
   article.appendChild(preview);
   preview.onload = () => {
     preview.style.height =
-        preview.contentWindow.document.body.scrollHeight + "px";
+        `${preview.contentWindow.document.body.scrollHeight}px`;
   };
   preview.contentWindow.document.open();
   preview.contentWindow.document.write(`
@@ -57,38 +57,38 @@ function addArticle(options) {
   preview.contentWindow.document.close();
 }
 
-// Convenience for allowing "await delay(100)" for sleeping in async functions.
+// Convenience for allowing `await delay(100)` for sleeping in async functions.
 function delay(ms) {
   return new Promise((resolve, reject) => setTimeout(resolve, ms));
 }
 
 // Dismiss the given article: no longer show it in the feed.
 async function dismiss(article, guid) {
-  chrome.runtime.sendMessage({type: "dismiss", guid});
+  chrome.runtime.sendMessage({type: 'dismiss', guid});
   article.style.height = getComputedStyle(article).height;
-  article.classList.add("remove");
+  article.classList.add('remove');
   await delay(100);
-  console.log("Removing article " + guid);
+  console.log(`Removing article ${guid}`);
   article.remove();
   if (articlesBox.childNodes.length == 0) {
-    emptyMessage.style.display = "block";
+    emptyMessage.style.display = 'block';
   }
 }
 
 // Prompt for a URI to subscribe to. This is an alternative to right-clicking
 // a link.
 async function subscribe() {
-  var uri = prompt("Enter an RSS feed URI");
-  chrome.runtime.sendMessage({type: "subscribe", uri});
+  var uri = prompt('Enter an RSS feed URI');
+  chrome.runtime.sendMessage({type: 'subscribe', uri});
 }
-subscribeButton.addEventListener("click", subscribe);
+subscribeButton.addEventListener('click', subscribe);
 
 // Asynchronously fetch the JSON representations of each feed item to show. If
 // forceRefresh is true, this will perform a fresh request to each feed to find
 // new content. If it is false, the last cached version will be used.
 function getFeeds(forceRefresh) {
   return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage({type: "getFeeds", forceRefresh}, response => {
+    chrome.runtime.sendMessage({type: 'getFeeds', forceRefresh}, response => {
       response === undefined ? reject() : resolve(response);
     });
   });
@@ -96,19 +96,19 @@ function getFeeds(forceRefresh) {
 
 // Call getFeeds and update the window accordingly.
 async function refresh(forceRefresh) {
-  console.log("Clearing articles.");
+  console.log('Clearing articles.');
   while (articlesBox.lastChild) articlesBox.removeChild(articlesBox.lastChild);
-  emptyMessage.style.display = "none";
-  loadingSpinner.style.display = "block";
+  emptyMessage.style.display = 'none';
+  loadingSpinner.style.display = 'block';
   var items = await getFeeds(forceRefresh);
-  loadingSpinner.style.display = "none";
+  loadingSpinner.style.display = 'none';
   if (items.length == 0) {
-    emptyMessage.style.display = "block";
+    emptyMessage.style.display = 'block';
   } else {
     items.forEach(addArticle);
   }
 }
-refreshButton.addEventListener("click", () => refresh(forceRefresh = true));
+refreshButton.addEventListener('click', () => refresh(forceRefresh = true));
 refresh(forceRefresh = false);
 
-expandButton.addEventListener("click", () => expandForm.submit());
+expandButton.addEventListener('click', () => expandForm.submit());
