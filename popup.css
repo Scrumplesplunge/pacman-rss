@@ -1,0 +1,118 @@
+:root {
+  --article-margin: 10px;
+  --article-padding: 10px;
+  --content-width: 500px;
+}
+
+/* Remove padding on the page and fix the width so that the popup isn't tiny */
+html, body {
+  min-width: var(--content-width);
+  margin: 0;
+  padding: 0;
+  background: #eee;
+}
+
+/* Set up the header as a blue bar with equally-sized buttons in it */
+body > header {
+  top: 0;
+  left: 0;
+  position: sticky;
+  display: flex;
+  width: 100%;
+  padding: 0;
+  background-color: #48f;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+body > header > button {
+  flex: 1 1 0;
+  background-color: rgba(0, 0, 0, 0);
+  color: #fff;
+  font: 16pt sans-serif;
+  margin: 0;
+  padding: 5px;
+  border: 0;
+}
+
+/* Make buttons light up slightly when focused or hovered */
+body > header > button:focus, body > header > button:hover {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Make buttons darken slightly when clicked */
+body > header > button:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Loading spinner (shown only while articles are loading) */
+#loadingSpinner {
+  margin: 30px auto;
+  opacity: 0.3;
+}
+
+/* Indent article contents */
+article {
+  background-color: #fff;
+  margin: var(--article-margin);
+  padding: var(--article-padding);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Dismissal button */
+article > button {
+  margin: 0;
+  font: 1.5em sans-serif;
+  width: 2em;
+  height: 2em;
+  text-align: center;
+  vertical-align: middle;
+  outline: none;
+  border: 0;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0);
+  float: right;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* Dismissal button */
+article > button:hover {
+  color: rgba(0, 0, 0, 1);
+}
+
+/* Style for articles that are being removed */
+article.remove {
+  overflow: hidden;
+  animation: remove 0.1s forwards;
+}
+
+@keyframes remove {
+  100% {
+    opacity: 0;
+    height: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* Make the timestamp slightly faded */
+article > time {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Message to show when there are no articles */
+#emptyMessage {
+  display: none;
+  margin: 20pt;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Render all preview content at a fixed width */
+iframe {
+  border: 0;
+  margin: 10px 0;
+  width: calc(var(--content-width) -
+              2 * var(--article-margin) -
+              2 * var(--article-padding));
+}
