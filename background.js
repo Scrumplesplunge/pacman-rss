@@ -37,6 +37,7 @@ function text(xml, path) {
   var node = root.evaluate(path, xml).iterateNext();
   if (node == null)
     throw new Error('No such path ' + path + ' in XML document.');
+  if (node.childNodes.length == 0) return '';
   if (node.childNodes.length != 1) {
     throw new Error('Path ' + path +
                     ' has multiple children when it should only contain text.');
